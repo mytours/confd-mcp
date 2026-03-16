@@ -5,6 +5,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { ConfdClient } from "./client.js";
 import { registerMuseumTools } from "./tools/museums.js";
 import { registerOrganizationTools } from "./tools/organizations.js";
+import { registerConferenceTools } from "./tools/conferences.js";
 
 const apiUrl = process.env.CONFD_API_URL;
 const apiKey = process.env.CONFD_API_KEY;
@@ -28,6 +29,7 @@ const server = new McpServer({
 
 registerMuseumTools(server, client);
 registerOrganizationTools(server, client);
+registerConferenceTools(server, client);
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
