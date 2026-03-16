@@ -14,6 +14,11 @@ export interface Logo {
   large: string;
 }
 
+export interface CoverImage {
+  banner: string;
+  thumb: string;
+}
+
 export interface Museum {
   id: number;
   name: string;
@@ -35,6 +40,7 @@ export interface Museum {
   tags: string[];
   social: Social;
   logo: Logo | null;
+  cover_image: CoverImage | null;
   created_at: string;
   updated_at: string;
 }
@@ -59,6 +65,7 @@ export interface Organization {
   tags: string[];
   social: Social;
   logo: Logo | null;
+  cover_image: CoverImage | null;
   created_at: string;
   updated_at: string;
 }
@@ -90,6 +97,7 @@ export interface Conference {
   tags: string[];
   social: Social;
   logo: Logo | null;
+  cover_image: CoverImage | null;
   created_at: string;
   updated_at: string;
 }

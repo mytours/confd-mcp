@@ -8,6 +8,7 @@ import type {
   OrganizationInput,
   ConferenceInput,
   PaginatedResponse,
+  CoverImage,
 } from "./types.js";
 
 const MIME_TYPES: Record<string, string> = {
@@ -24,7 +25,8 @@ const ALLOWED_CONTENT_TYPES = [
   "image/webp",
   "image/gif",
 ];
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_LOGO_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_COVER_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
 
 export interface ListMuseumsParams {
   query?: string;
@@ -144,7 +146,7 @@ export class ConfdClient {
     museumId: number,
     input: LogoUploadInput
   ): Promise<Museum> {
-    return this.uploadLogo(`/museums/${museumId}/logo`, input);
+    return this.uploadImage(`/museums/${museumId}/logo`, input, "logo", MAX_LOGO_SIZE);
   }
 
   async deleteMuseumLogo(museumId: number): Promise<Museum> {
@@ -186,10 +188,7 @@ export class ConfdClient {
     organizationId: number,
     input: LogoUploadInput
   ): Promise<Organization> {
-    return this.uploadLogo(
-      `/organizations/${organizationId}/logo`,
-      input
-    );
+    return this.uploadImage(`/organizations/${organizationId}/logo`, input, "logo", MAX_LOGO_SIZE);
   }
 
   async deleteOrganizationLogo(organizationId: number): Promise<Organization> {
@@ -216,9 +215,55 @@ export class ConfdClient {
     return this.request("PATCH", `/conferences/${id}`, { conference: data });
   }
 
-  // --- Logo upload ---
+  async uploadConferenceLogo(
+    conferenceId: number,
+    input: LogoUploadInput
+  ): Promise<Conference> {
+    return this.uploadImage(`/conferences/${conferenceId}/logo`, input, "logo", MAX_LOGO_SIZE);
+  }
 
-  private async uploadLogo<T>(path: string, input: LogoUploadInput): Promise<T> {
+  async deleteConferenceLogo(conferenceId: number): Promise<Conference> {
+    return this.request("DELETE", `/conferences/${conferenceId}/logo`);
+  }
+
+  // --- Cover image upload ---
+
+  async uploadMuseumCoverImage(
+    museumId: number,
+    input: LogoUploadInput
+  ): Promise<Museum> {
+    return this.uploadImage(`/museums/${museumId}/cover_image`, input, "cover_image", MAX_COVER_IMAGE_SIZE);
+  }
+
+  async deleteMuseumCoverImage(museumId: number): Promise<Museum> {
+    return this.request("DELETE", `/museums/${museumId}/cover_image`);
+  }
+
+  async uploadOrganizationCoverImage(
+    organizationId: number,
+    input: LogoUploadInput
+  ): Promise<Organization> {
+    return this.uploadImage(`/organizations/${organizationId}/cover_image`, input, "cover_image", MAX_COVER_IMAGE_SIZE);
+  }
+
+  async deleteOrganizationCoverImage(organizationId: number): Promise<Organization> {
+    return this.request("DELETE", `/organizations/${organizationId}/cover_image`);
+  }
+
+  async uploadConferenceCoverImage(
+    conferenceId: number,
+    input: LogoUploadInput
+  ): Promise<Conference> {
+    return this.uploadImage(`/conferences/${conferenceId}/cover_image`, input, "cover_image", MAX_COVER_IMAGE_SIZE);
+  }
+
+  async deleteConferenceCoverImage(conferenceId: number): Promise<Conference> {
+    return this.request("DELETE", `/conferences/${conferenceId}/cover_image`);
+  }
+
+  // --- Image upload ---
+
+  private async uploadImage<T>(path: string, input: LogoUploadInput, paramName: string, maxSize: number): Promise<T> {
     const sources = [input.url, input.base64, input.file_path].filter(Boolean);
     if (sources.length !== 1) {
       throw new Error(
@@ -264,15 +309,15 @@ export class ConfdClient {
       );
     }
 
-    if (buffer.length > MAX_FILE_SIZE) {
+    if (buffer.length > maxSize) {
       throw new Error(
-        `File too large: ${(buffer.length / 1024 / 1024).toFixed(1)}MB. Maximum: 5MB`
+        `File too large: ${(buffer.length / 1024 / 1024).toFixed(1)}MB. Maximum: ${maxSize / 1024 / 1024}MB`
       );
     }
 
     const formData = new FormData();
     const blob = new Blob([new Uint8Array(buffer)], { type: contentType });
-    formData.append("logo", blob, filename);
+    formData.append(paramName, blob, filename);
 
     const url = `${this.baseUrl}${path}`;
     const response = await fetch(url, {

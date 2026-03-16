@@ -201,4 +201,101 @@ export function registerConferenceTools(
       };
     }
   );
+
+  server.tool(
+    "upload_conference_logo",
+    "Upload a logo image for a conference. Provide exactly one of: url (fetch from URL), base64 (base64-encoded image data), or file_path (local file path). Accepts png, jpeg, webp, gif up to 5MB.",
+    {
+      conference_id: z.number().describe("Conference ID"),
+      url: z.string().optional().describe("URL to fetch the image from"),
+      base64: z
+        .string()
+        .optional()
+        .describe("Base64-encoded image data"),
+      file_path: z
+        .string()
+        .optional()
+        .describe("Local file path to the image"),
+      filename: z
+        .string()
+        .optional()
+        .describe("Filename for the uploaded image"),
+      content_type: z
+        .string()
+        .optional()
+        .describe(
+          "MIME type (required for base64, optional for url/file_path). e.g. image/png"
+        ),
+    },
+    async ({ conference_id, ...input }) => {
+      const result = await client.uploadConferenceLogo(conference_id, input);
+      return {
+        content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+      };
+    }
+  );
+
+  server.tool(
+    "delete_conference_logo",
+    "Remove the logo from a conference.",
+    {
+      conference_id: z.number().describe("Conference ID"),
+    },
+    async ({ conference_id }) => {
+      const result = await client.deleteConferenceLogo(conference_id);
+      return {
+        content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+      };
+    }
+  );
+
+  server.tool(
+    "upload_conference_cover_image",
+    "Upload a cover image for a conference. Displayed as the hero banner background. Provide exactly one of: url, base64, or file_path. Accepts png, jpeg, webp, gif up to 10MB.",
+    {
+      conference_id: z.number().describe("Conference ID"),
+      url: z.string().optional().describe("URL to fetch the image from"),
+      base64: z
+        .string()
+        .optional()
+        .describe("Base64-encoded image data"),
+      file_path: z
+        .string()
+        .optional()
+        .describe("Local file path to the image"),
+      filename: z
+        .string()
+        .optional()
+        .describe("Filename for the uploaded image"),
+      content_type: z
+        .string()
+        .optional()
+        .describe(
+          "MIME type (required for base64, optional for url/file_path). e.g. image/png"
+        ),
+    },
+    async ({ conference_id, ...input }) => {
+      const result = await client.uploadConferenceCoverImage(
+        conference_id,
+        input
+      );
+      return {
+        content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+      };
+    }
+  );
+
+  server.tool(
+    "delete_conference_cover_image",
+    "Remove the cover image from a conference.",
+    {
+      conference_id: z.number().describe("Conference ID"),
+    },
+    async ({ conference_id }) => {
+      const result = await client.deleteConferenceCoverImage(conference_id);
+      return {
+        content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+      };
+    }
+  );
 }
