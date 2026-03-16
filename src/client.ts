@@ -3,8 +3,10 @@ import { extname } from "node:path";
 import type {
   Museum,
   Organization,
+  Conference,
   MuseumInput,
   OrganizationInput,
+  ConferenceInput,
   PaginatedResponse,
 } from "./types.js";
 
@@ -40,6 +42,15 @@ export interface ListOrganizationsParams {
   source?: string;
   tag?: string;
   discarded?: string;
+  page?: number;
+}
+
+export interface ListConferencesParams {
+  query?: string;
+  country_code?: string;
+  organization_id?: number;
+  tag?: string;
+  scope?: string;
   page?: number;
 }
 
@@ -183,6 +194,26 @@ export class ConfdClient {
 
   async deleteOrganizationLogo(organizationId: number): Promise<Organization> {
     return this.request("DELETE", `/organizations/${organizationId}/logo`);
+  }
+
+  // --- Conferences ---
+
+  async listConferences(
+    params: ListConferencesParams = {}
+  ): Promise<PaginatedResponse<Conference>> {
+    return this.request("GET", `/conferences${this.buildQuery(params)}`);
+  }
+
+  async getConference(id: number): Promise<Conference> {
+    return this.request("GET", `/conferences/${id}`);
+  }
+
+  async createConference(data: ConferenceInput): Promise<Conference> {
+    return this.request("POST", "/conferences", { conference: data });
+  }
+
+  async updateConference(id: number, data: ConferenceInput): Promise<Conference> {
+    return this.request("PATCH", `/conferences/${id}`, { conference: data });
   }
 
   // --- Logo upload ---
