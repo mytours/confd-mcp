@@ -1,33 +1,43 @@
-# confd-mcp
+# @stqry/confd-mcp
 
-MCP server for the [ConFd](https://github.com/mytours/confd) museums and organizations API.
+MCP server for the [ConFd](https://github.com/mytours/confd) museums, organizations, and conferences API.
 
-## Setup
+## Install
 
 ```bash
-npm install
-npm run build
+npm install -g @stqry/confd-mcp
 ```
 
-## Configuration
-
-Set two environment variables:
+You'll need a ConFd API key. Set these environment variables:
 
 ```bash
 export CONFD_API_URL="https://confd.stqry.com/api/v1"
 export CONFD_API_KEY="your-api-key"
 ```
 
-## Usage with Claude Desktop
+## Setup
 
-Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json`):
+### Claude Code
+
+```bash
+claude mcp add confd -- npx -y @stqry/confd-mcp
+```
+
+Then set the environment variables in your shell before launching Claude Code, or add them to your shell profile.
+
+### Claude Desktop
+
+Add to your config file:
+
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 
 ```json
 {
   "mcpServers": {
     "confd": {
-      "command": "node",
-      "args": ["/path/to/confd-mcp/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "@stqry/confd-mcp"],
       "env": {
         "CONFD_API_URL": "https://confd.stqry.com/api/v1",
         "CONFD_API_KEY": "your-api-key"
@@ -37,17 +47,45 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 }
 ```
 
-## Usage with Claude Code
+### Cursor
 
-Add to your Claude Code settings:
+Add to `.cursor/mcp.json` in your project or `~/.cursor/mcp.json` globally:
 
-```bash
-claude mcp add confd -- node /path/to/confd-mcp/dist/index.js
+```json
+{
+  "mcpServers": {
+    "confd": {
+      "command": "npx",
+      "args": ["-y", "@stqry/confd-mcp"],
+      "env": {
+        "CONFD_API_URL": "https://confd.stqry.com/api/v1",
+        "CONFD_API_KEY": "your-api-key"
+      }
+    }
+  }
+}
 ```
 
-Then set the environment variables in your shell.
+### Windsurf
 
-## Tools (16)
+Add to `~/.codeium/windsurf/mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "confd": {
+      "command": "npx",
+      "args": ["-y", "@stqry/confd-mcp"],
+      "env": {
+        "CONFD_API_URL": "https://confd.stqry.com/api/v1",
+        "CONFD_API_KEY": "your-api-key"
+      }
+    }
+  }
+}
+```
+
+## Tools (18)
 
 ### Museums
 
@@ -73,9 +111,19 @@ Then set the environment variables in your shell.
 | `upload_organization_logo` | Upload a logo |
 | `delete_organization_logo` | Remove an organization's logo |
 
+### Conferences
+
+| Tool | Description |
+|------|-------------|
+| `list_conferences` | Search and filter conferences by name, country, organization, tag, scope (upcoming/past) |
+| `get_conference` | Get a conference by ID |
+| `create_conference` | Create a new conference with dates, venue, registration info |
+| `update_conference` | Update a conference by ID |
+
 ## Development
 
 ```bash
+npm install
 npm run dev    # Watch mode
 npm run build  # Production build
 npm start      # Run the server
