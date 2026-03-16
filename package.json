@@ -1,6 +1,6 @@
 {
   "name": "@stqry/confd-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MCP server for the ConFd museums and organizations API",
   "type": "module",
   "bin": {
@@ -16,7 +16,12 @@
     "start": "node dist/index.js",
     "dev": "tsc --watch"
   },
-  "keywords": ["mcp", "museums", "organizations", "confd"],
+  "keywords": [
+    "mcp",
+    "museums",
+    "organizations",
+    "confd"
+  ],
   "license": "MIT",
   "publishConfig": {
     "access": "public"
