@@ -2,6 +2,32 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { ConfdClient } from "../client.js";
 
+const openingHourSchema = z.object({
+  id: z.number().optional().describe("Opening hour ID (for updates/deletes)"),
+  row_type: z.enum(["hours", "text"]).describe("Row type: 'hours' for structured time data, 'text' for free-text notes"),
+  position: z.number().describe("Display order position"),
+  group_key: z.string().optional().describe("Group key for header grouping (e.g., 'summer', 'winter')"),
+  days: z.array(z.number()).optional().describe("Array of day numbers: 1=Sun, 2=Mon, 3=Tue, 4=Wed, 5=Thu, 6=Fri, 7=Sat"),
+  opens: z.string().optional().describe("Opening time in HH:MM format (e.g., '09:00')"),
+  closes: z.string().optional().describe("Closing time in HH:MM format (e.g., '17:00')"),
+  closed: z.boolean().optional().describe("Mark these days as closed"),
+  label: z.string().optional().describe("Label text (used as display text for 'text' rows, optional override for 'hours' rows)"),
+  notes: z.string().optional().describe("Additional notes for this row"),
+  _destroy: z.boolean().optional().describe("Set to true to delete this row"),
+});
+
+const admissionPriceSchema = z.object({
+  id: z.number().optional().describe("Admission price ID (for updates/deletes)"),
+  row_type: z.enum(["price", "text"]).describe("Row type: 'price' for structured pricing, 'text' for free-text notes"),
+  position: z.number().describe("Display order position"),
+  group_key: z.string().optional().describe("Group key for header grouping (e.g., 'general', 'special_exhibition')"),
+  amount_cents: z.number().optional().describe("Price in cents (e.g., 1500 = 15.00). Use 0 for free."),
+  currency: z.string().optional().describe("ISO 4217 currency code (e.g., 'USD', 'EUR', 'NZD')"),
+  label: z.string().optional().describe("Price category label (e.g., 'Adults', 'Children (6-12)')"),
+  notes: z.string().optional().describe("Additional notes for this row"),
+  _destroy: z.boolean().optional().describe("Set to true to delete this row"),
+});
+
 export function registerMuseumTools(server: McpServer, client: ConfdClient) {
   server.tool(
     "list_museums",
@@ -56,7 +82,7 @@ export function registerMuseumTools(server: McpServer, client: ConfdClient) {
 
   server.tool(
     "create_museum",
-    "Create a new museum. Name is required. Can include contact info, address, social media, tags, and more.",
+    "Create a new museum. Name is required. Can include contact info, address, social media, tags, opening hours, and admission prices.",
     {
       name: z.string().describe("Museum name (required)"),
       description: z.string().optional().describe("Museum description"),
@@ -82,6 +108,7 @@ export function registerMuseumTools(server: McpServer, client: ConfdClient) {
         .optional()
         .describe("External source identifier (must be unique)"),
       published: z.boolean().optional().describe("Published status"),
+      do_not_import: z.boolean().optional().describe("Flag to prevent automated imports from overwriting this record"),
       facebook: z.string().optional().describe("Facebook URL"),
       instagram: z.string().optional().describe("Instagram URL"),
       twitter: z.string().optional().describe("Twitter/X URL"),
@@ -93,6 +120,14 @@ export function registerMuseumTools(server: McpServer, client: ConfdClient) {
         .string()
         .optional()
         .describe("Comma-separated tags (e.g. 'history, art')"),
+      opening_hours_attributes: z
+        .array(openingHourSchema)
+        .optional()
+        .describe("Opening hours rows (ordered list of hours/text entries)"),
+      admission_prices_attributes: z
+        .array(admissionPriceSchema)
+        .optional()
+        .describe("Admission price rows (ordered list of price/text entries)"),
     },
     async (params) => {
       const result = await client.createMuseum(params);
@@ -104,7 +139,7 @@ export function registerMuseumTools(server: McpServer, client: ConfdClient) {
 
   server.tool(
     "update_museum",
-    "Update an existing museum by ID. Only include fields you want to change. Works even if do_not_import is set.",
+    "Update an existing museum by ID. Only include fields you want to change. Works even if do_not_import is set. Opening hours and admission prices use nested attributes (include id to update, _destroy to delete).",
     {
       id: z.number().describe("Museum ID"),
       name: z.string().optional().describe("Museum name"),
@@ -128,6 +163,7 @@ export function registerMuseumTools(server: McpServer, client: ConfdClient) {
       lng: z.number().optional().describe("Longitude"),
       source: z.string().optional().describe("External source identifier"),
       published: z.boolean().optional().describe("Published status"),
+      do_not_import: z.boolean().optional().describe("Flag to prevent automated imports from overwriting this record"),
       facebook: z.string().optional().describe("Facebook URL"),
       instagram: z.string().optional().describe("Instagram URL"),
       twitter: z.string().optional().describe("Twitter/X URL"),
@@ -139,6 +175,14 @@ export function registerMuseumTools(server: McpServer, client: ConfdClient) {
         .string()
         .optional()
         .describe("Comma-separated tags (e.g. 'history, art')"),
+      opening_hours_attributes: z
+        .array(openingHourSchema)
+        .optional()
+        .describe("Opening hours rows (include id to update existing, _destroy to delete)"),
+      admission_prices_attributes: z
+        .array(admissionPriceSchema)
+        .optional()
+        .describe("Admission price rows (include id to update existing, _destroy to delete)"),
     },
     async ({ id, ...data }) => {
       const result = await client.updateMuseum(id, data);
@@ -173,6 +217,7 @@ export function registerMuseumTools(server: McpServer, client: ConfdClient) {
       lat: z.number().optional().describe("Latitude"),
       lng: z.number().optional().describe("Longitude"),
       published: z.boolean().optional().describe("Published status"),
+      do_not_import: z.boolean().optional().describe("Flag to prevent automated imports from overwriting this record"),
       facebook: z.string().optional().describe("Facebook URL"),
       instagram: z.string().optional().describe("Instagram URL"),
       twitter: z.string().optional().describe("Twitter/X URL"),
@@ -184,6 +229,14 @@ export function registerMuseumTools(server: McpServer, client: ConfdClient) {
         .string()
         .optional()
         .describe("Comma-separated tags (e.g. 'history, art')"),
+      opening_hours_attributes: z
+        .array(openingHourSchema)
+        .optional()
+        .describe("Opening hours rows"),
+      admission_prices_attributes: z
+        .array(admissionPriceSchema)
+        .optional()
+        .describe("Admission price rows"),
     },
     async (params) => {
       const result = await client.upsertMuseum(params);

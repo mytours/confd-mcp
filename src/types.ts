@@ -19,6 +19,61 @@ export interface CoverImage {
   thumb: string;
 }
 
+export interface OpeningHour {
+  id: number;
+  row_type: "hours" | "text";
+  position: number;
+  group_key: string | null;
+  days: number[] | null;
+  opens: string | null;
+  closes: string | null;
+  closed: boolean;
+  label: string | null;
+  notes: string | null;
+  group_label?: string;
+  display_text: string;
+}
+
+export interface AdmissionPrice {
+  id: number;
+  row_type: "price" | "text";
+  position: number;
+  group_key: string | null;
+  amount_cents: number | null;
+  currency: string;
+  label: string | null;
+  notes: string | null;
+  formatted_price: string;
+  group_label?: string;
+  display_text: string;
+}
+
+export interface OpeningHourInput {
+  id?: number;
+  row_type: "hours" | "text";
+  position: number;
+  group_key?: string;
+  days?: number[];
+  opens?: string;
+  closes?: string;
+  closed?: boolean;
+  label?: string;
+  notes?: string;
+  _destroy?: boolean;
+}
+
+export interface AdmissionPriceInput {
+  id?: number;
+  row_type: "price" | "text";
+  position: number;
+  group_key?: string;
+  amount_cents?: number;
+  currency?: string;
+  label?: string;
+  notes?: string;
+  _destroy?: boolean;
+}
+
 export interface Museum {
   id: number;
   name: string;
@@ -36,11 +91,14 @@ export interface Museum {
   lng: string | null;
   source: string | null;
   published: boolean;
+  do_not_import: boolean;
   discarded_at: string | null;
   tags: string[];
   social: Social;
   logo: Logo | null;
   cover_image: CoverImage | null;
+  opening_hours: OpeningHour[];
+  admission_prices: AdmissionPrice[];
   created_at: string;
   updated_at: string;
 }
@@ -172,6 +230,7 @@ export interface MuseumInput {
   lng?: number;
   source?: string;
   published?: boolean;
+  do_not_import?: boolean;
   facebook?: string;
   instagram?: string;
   twitter?: string;
@@ -180,6 +239,8 @@ export interface MuseumInput {
   threads?: string;
   tiktok?: string;
   tag_list?: string;
+  opening_hours_attributes?: OpeningHourInput[];
+  admission_prices_attributes?: AdmissionPriceInput[];
 }
 
 export interface OrganizationInput {
