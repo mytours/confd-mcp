@@ -91,6 +91,7 @@ export function registerOrganizationTools(
         .string()
         .optional()
         .describe("Comma-separated tags (e.g. 'heritage, digital')"),
+      do_not_import: z.boolean().optional().describe("Flag to prevent automated imports from overwriting this record"),
     },
     async (params) => {
       const result = await client.createOrganization(params);
@@ -136,6 +137,7 @@ export function registerOrganizationTools(
         .string()
         .optional()
         .describe("Comma-separated tags (e.g. 'heritage, digital')"),
+      do_not_import: z.boolean().optional().describe("Flag to prevent automated imports from overwriting this record"),
     },
     async ({ id, ...data }) => {
       const result = await client.updateOrganization(id, data);
@@ -185,6 +187,7 @@ export function registerOrganizationTools(
         .string()
         .optional()
         .describe("Comma-separated tags (e.g. 'heritage, digital')"),
+      do_not_import: z.boolean().optional().describe("Flag to prevent automated imports from overwriting this record"),
     },
     async (params) => {
       const result = await client.upsertOrganization(params);
