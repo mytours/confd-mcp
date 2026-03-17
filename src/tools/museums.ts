@@ -247,6 +247,21 @@ export function registerMuseumTools(server: McpServer, client: ConfdClient) {
   );
 
   server.tool(
+    "merge_museum",
+    "Merge a museum into another museum. The source museum (id) will have its merged_into_id set and be discarded. The target museum (merged_into_id) remains unchanged. Returns the updated source museum record.",
+    {
+      id: z.number().describe("ID of the source museum to merge (will be discarded)"),
+      merged_into_id: z.number().describe("ID of the target museum to merge into"),
+    },
+    async ({ id, merged_into_id }) => {
+      const result = await client.mergeMuseum(id, merged_into_id);
+      return {
+        content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+      };
+    }
+  );
+
+  server.tool(
     "upload_museum_logo",
     "Upload a logo image for a museum. Provide exactly one of: url (fetch from URL), base64 (base64-encoded image data), or file_path (local file path). Accepts png, jpeg, webp, gif up to 5MB.",
     {

@@ -142,6 +142,10 @@ export class ConfdClient {
     return this.request("PUT", "/museums/upsert", { museum: data });
   }
 
+  async mergeMuseum(id: number, mergedIntoId: number): Promise<Museum> {
+    return this.request("POST", `/museums/${id}/merge`, { merged_into_id: mergedIntoId });
+  }
+
   async uploadMuseumLogo(
     museumId: number,
     input: LogoUploadInput
@@ -182,6 +186,10 @@ export class ConfdClient {
     return this.request("PUT", "/organizations/upsert", {
       organization: data,
     });
+  }
+
+  async mergeOrganization(id: number, mergedIntoId: number): Promise<Organization> {
+    return this.request("POST", `/organizations/${id}/merge`, { merged_into_id: mergedIntoId });
   }
 
   async uploadOrganizationLogo(

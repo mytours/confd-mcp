@@ -195,6 +195,21 @@ export function registerOrganizationTools(
   );
 
   server.tool(
+    "merge_organization",
+    "Merge an organization into another organization. The source organization (id) will have its merged_into_id set and be discarded. The target organization (merged_into_id) remains unchanged. Returns the updated source organization record.",
+    {
+      id: z.number().describe("ID of the source organization to merge (will be discarded)"),
+      merged_into_id: z.number().describe("ID of the target organization to merge into"),
+    },
+    async ({ id, merged_into_id }) => {
+      const result = await client.mergeOrganization(id, merged_into_id);
+      return {
+        content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+      };
+    }
+  );
+
+  server.tool(
     "upload_organization_logo",
     "Upload a logo image for an organization. Provide exactly one of: url (fetch from URL), base64 (base64-encoded image data), or file_path (local file path). Accepts png, jpeg, webp, gif up to 5MB.",
     {
