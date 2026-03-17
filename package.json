@@ -1,6 +1,6 @@
 {
   "name": "@stqry/confd-mcp",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "MCP server for the ConFd museums and organizations API",
   "type": "module",
   "bin": {
