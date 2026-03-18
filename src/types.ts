@@ -34,6 +34,15 @@ export interface OpeningHour {
   display_text: string;
 }
 
+export interface Facility {
+  id: number;
+  row_type: "facility" | "text";
+  position: number;
+  facility_type: string | null;
+  notes: string | null;
+  label: string;
+}
+
 export interface AdmissionPrice {
   id: number;
   row_type: "price" | "text";
@@ -74,6 +83,15 @@ export interface AdmissionPriceInput {
   _destroy?: boolean;
 }
 
+export interface FacilityInput {
+  id?: number;
+  row_type: "facility" | "text";
+  position: number;
+  facility_type?: string;
+  notes?: string;
+  _destroy?: boolean;
+}
+
 export interface Museum {
   id: number;
   name: string;
@@ -97,8 +115,10 @@ export interface Museum {
   social: Social;
   logo: Logo | null;
   cover_image: CoverImage | null;
+  transport: string | null;
   opening_hours: OpeningHour[];
   admission_prices: AdmissionPrice[];
+  facilities: Facility[];
   created_at: string;
   updated_at: string;
 }
@@ -239,8 +259,10 @@ export interface MuseumInput {
   threads?: string;
   tiktok?: string;
   tag_list?: string;
+  transport?: string;
   opening_hours_attributes?: OpeningHourInput[];
   admission_prices_attributes?: AdmissionPriceInput[];
+  facilities_attributes?: FacilityInput[];
 }
 
 export interface OrganizationInput {

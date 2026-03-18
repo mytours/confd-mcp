@@ -16,6 +16,15 @@ const openingHourSchema = z.object({
   _destroy: z.boolean().optional().describe("Set to true to delete this row"),
 });
 
+const facilitySchema = z.object({
+  id: z.number().optional().describe("Facility ID (for updates/deletes)"),
+  row_type: z.enum(["facility", "text"]).describe("Row type: 'facility' for an amenity entry, 'text' for a free-text note"),
+  position: z.number().describe("Display order position"),
+  facility_type: z.string().optional().describe("Facility type slug (e.g. 'wheelchair', 'parking', 'cafe', 'guided_tours'). Label is resolved from i18n; unknown slugs are humanized."),
+  notes: z.string().optional().describe("Additional notes for this facility (e.g. 'Limited on-site parking')"),
+  _destroy: z.boolean().optional().describe("Set to true to delete this row"),
+});
+
 const admissionPriceSchema = z.object({
   id: z.number().optional().describe("Admission price ID (for updates/deletes)"),
   row_type: z.enum(["price", "text"]).describe("Row type: 'price' for structured pricing, 'text' for free-text notes"),
@@ -57,6 +66,7 @@ export function registerMuseumTools(server: McpServer, client: ConfdClient) {
           "Filter discarded records: false (default, kept only), true (discarded only), all (both)"
         ),
       page: z.number().optional().describe("Page number (default: 1)"),
+      limit: z.number().optional().describe("Number of results per page (default: 20, max: 100)"),
     },
     async (params) => {
       const result = await client.listMuseums(params);
@@ -120,6 +130,7 @@ export function registerMuseumTools(server: McpServer, client: ConfdClient) {
         .string()
         .optional()
         .describe("Comma-separated tags (e.g. 'history, art')"),
+      transport: z.string().optional().describe("How to get there (markdown supported)"),
       opening_hours_attributes: z
         .array(openingHourSchema)
         .optional()
@@ -128,6 +139,10 @@ export function registerMuseumTools(server: McpServer, client: ConfdClient) {
         .array(admissionPriceSchema)
         .optional()
         .describe("Admission price rows (ordered list of price/text entries)"),
+      facilities_attributes: z
+        .array(facilitySchema)
+        .optional()
+        .describe("Facility/amenity rows (e.g. wheelchair access, parking, cafe)"),
     },
     async (params) => {
       const result = await client.createMuseum(params);
@@ -175,6 +190,7 @@ export function registerMuseumTools(server: McpServer, client: ConfdClient) {
         .string()
         .optional()
         .describe("Comma-separated tags (e.g. 'history, art')"),
+      transport: z.string().optional().describe("How to get there (markdown supported)"),
       opening_hours_attributes: z
         .array(openingHourSchema)
         .optional()
@@ -183,6 +199,10 @@ export function registerMuseumTools(server: McpServer, client: ConfdClient) {
         .array(admissionPriceSchema)
         .optional()
         .describe("Admission price rows (include id to update existing, _destroy to delete)"),
+      facilities_attributes: z
+        .array(facilitySchema)
+        .optional()
+        .describe("Facility/amenity rows (include id to update existing, _destroy to delete)"),
     },
     async ({ id, ...data }) => {
       const result = await client.updateMuseum(id, data);
@@ -229,6 +249,7 @@ export function registerMuseumTools(server: McpServer, client: ConfdClient) {
         .string()
         .optional()
         .describe("Comma-separated tags (e.g. 'history, art')"),
+      transport: z.string().optional().describe("How to get there (markdown supported)"),
       opening_hours_attributes: z
         .array(openingHourSchema)
         .optional()
@@ -237,6 +258,10 @@ export function registerMuseumTools(server: McpServer, client: ConfdClient) {
         .array(admissionPriceSchema)
         .optional()
         .describe("Admission price rows"),
+      facilities_attributes: z
+        .array(facilitySchema)
+        .optional()
+        .describe("Facility/amenity rows (e.g. wheelchair access, parking, cafe)"),
     },
     async (params) => {
       const result = await client.upsertMuseum(params);
