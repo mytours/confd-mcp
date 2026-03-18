@@ -30,6 +30,7 @@ export function registerConferenceTools(
           "Filter by time scope: upcoming (future conferences), past (past conferences). Omit for all."
         ),
       page: z.number().optional().describe("Page number (default: 1)"),
+      limit: z.number().optional().describe("Number of results per page (default: 20, max: 100)"),
     },
     async (params) => {
       const result = await client.listConferences(params);

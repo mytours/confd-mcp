@@ -36,6 +36,7 @@ export interface ListMuseumsParams {
   published?: string;
   discarded?: string;
   page?: number;
+  limit?: number;
 }
 
 export interface ListOrganizationsParams {
@@ -45,6 +46,7 @@ export interface ListOrganizationsParams {
   tag?: string;
   discarded?: string;
   page?: number;
+  limit?: number;
 }
 
 export interface ListConferencesParams {
@@ -54,6 +56,7 @@ export interface ListConferencesParams {
   tag?: string;
   scope?: string;
   page?: number;
+  limit?: number;
 }
 
 export interface LogoUploadInput {
